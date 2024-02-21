@@ -1,8 +1,10 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('profile.update'), $user }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('profile.update', $user) }}" enctype="multipart/form-data">
         @csrf
         @method('patch')
-
+        <?php
+        //dd($user->id);
+        ?>
         <!-- Name -->
         <div>
             <x-input-label for="surname" :value="__('姓')" />
@@ -13,8 +15,8 @@
             <x-text-input id="given_name" class="block mt-1 w-full" type="text" name="given_name" :value="old('given_name', $user->given_name)" required autofocus autocomplete="given_name" />
             <x-input-error :messages="$errors->get('given_name')" class="mt-2" />
         </div>
-
         <div class="mt-4">
+            <img src="{{ asset('storage/img/' .  $user->image_file_name) }}">
             <input type="file" name="image_file_name">
             <x-input-error :messages="$errors->get('image_file_name')" class="mt-2" />
             <button>アップロード</button>
@@ -27,30 +29,38 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <?php 
+        $strDate = explode("-",$user->birth_day);
+        $date = array_map('intval', $strDate);
+        $userYear = $date[0];
+        $userMonth = $date[1];
+        $userDay = $date[2];
+      
+        ?>
         <!-- birth day -->
         <div class="mt-4">      
             <select id="year" name="year" class="form-select">
-                <option value="">-</option>
+                <option value="">{{$userYear}}</option>
                 @foreach(MyFunction::yearSelect() as $year)
-                    <option value="{{ $year }}">{{ old('year', $user->year) == $year ? 'selected' : '' }}{{ $year }}</option>
+                    <option value="{{ $year }}">{{ old('year', $userYear) == $year ? 'selected' : '' }}{{ $year }}</option>
                 @endforeach
                 
             </select>
             <label for="year">年</label>
 
             <select id="month" name="month" class="form-select">
-                <option value="">-</option>
+                <option value="">{{$userMonth}}</option>
                 @foreach(MyFunction::monthSelect() as $month)
-                    <option value="{{ $month }}">{{ old('month', $user->month) == $month ? 'selected' : '' }}{{ $month }}</option>
+                    <option value="{{ $month }}">{{ old('month', $userMonth) == $month ? 'selected' : '' }}{{ $month }}</option>
                 @endforeach
                 
             </select>
             <label for="month">月</label>
 
             <select id="day" name="day" class="form-select">
-                <option value="">-</option>
+                <option value="">{{$userDay}}</option>
                 @foreach(MyFunction::daySelect() as $day)
-                    <option value="{{ $day }}">{{ old('day', $user->day) == $day ? 'selected' : '' }}{{ $day }}</option>
+                    <option value="{{ $day }}">{{ old('day', $userDay) == $day ? 'selected' : '' }}{{ $day }}</option>
                 @endforeach
                 
             </select>
@@ -89,12 +99,9 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('既存ユーザーはこちら') }}
-            </a>
 
             <x-primary-button class="ms-4">
-                {{ __('登録') }}
+                {{ __('更新') }}
             </x-primary-button>
         </div>
     </form>

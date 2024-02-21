@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\User;
+use App\Lib\MyFunction;
 
 
 class ProfileController extends Controller
@@ -18,39 +19,45 @@ class ProfileController extends Controller
      * Display the user's profile form.
      */
 
-    public function edit(ProfileUpdateRequest $request, User $user): View
+    public function edit(Request $request, $id): View
     {
+        //dd($id);
+        $user = User::findOrFail($id);
+        //return view('profile.edit', ['user'=>$user]);
         return view('profile.edit', compact('user'));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request, User $user): RedirectResponse
+    public function update(Request $request, User $user)
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $user()->update();
-        $request->session()->flash('message', '更新しました');
-        return back;
-
         
+        $validated = $request->validate([
+            
+            'surname' => ['required', 'string', 'max:255'],
+            'given_name' => ['required', 'string', 'max:255'],
+            'image_file_name'=>['required', 'file', 'mimes:jpeg,png', 'max:1000'], //kb
+            'birth_day'=>['required', 'date', 'before:today'],
+            'phone' => ['required', 'string', 'max:30'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+           
+        ]);
+        
+        $user->update($validated);
+        $request->session()->flash('message', '更新しました');
+        return back; 
     }
 
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, User $user): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
-
-        $user = $request->user();
 
         Auth::logout();
 

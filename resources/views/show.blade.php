@@ -9,12 +9,12 @@
         @foreach($users as $user)
             <div class="mt-4 text-lg font-semibold">
                 <div class ="text-right">
-                    <a href="{{route('profile.edit', $user)}}">
+                    <a href="{{route('profile.edit', ['id'=>$user->id])}}">
                         <x-primary-button>
                             編集
                         </x-primary-button>
                     </a>
-                    <a href="{{route('profile.destroy', $user)}}">
+                    <a href="{{route('profile.destroy', ['id'=>$user->id])}}">
                         <x-primary-button>
                             削除
                         </x-primary-button>

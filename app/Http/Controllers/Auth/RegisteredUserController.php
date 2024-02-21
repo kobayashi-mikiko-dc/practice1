@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
             'surname' => ['required', 'string', 'max:255'],
             'given_name' => ['required', 'string', 'max:255'],
             'image_file_name'=>['required', 'file', 'mimes:jpeg,png', 'max:1000'], //kb
-            //birthday
+            'birth_day'=>['required', 'date', 'before:today'],
             'phone' => ['required', 'string', 'max:30'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
@@ -62,8 +62,8 @@ class RegisteredUserController extends Controller
             $user = User::create([
                 'surname' => $request->surname,
                 'given_name' => $request->given_name,
-                'image_path' => $request->image_path = 'storage/app/public/img/'.$file_name,
-                'image_file_name' => $request->image_file_name = $file_name,
+                'image_path' => 'storage/app/public/img/'.$file_name,
+                'image_file_name' => $file_name,
                 'birth_day'=>$birth_day, 
                 'phone' => $request->phone,
                 'email' => $request->email,
@@ -84,8 +84,8 @@ class RegisteredUserController extends Controller
             $file_name = "{$id}_{$surname}_{$given_name}.{$format}";
             $image_path = 'public/img/'.$file_name;
             $user->update([
-                'image_path' => $request->image_path = $image_path,
-                'image_file_name' => $request->file_name = $file_name,
+                'image_path' => $image_path,
+                'image_file_name' => $file_name,
             ]);
             //画像を保存
             
