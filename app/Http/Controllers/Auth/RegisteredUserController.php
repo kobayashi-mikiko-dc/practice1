@@ -89,7 +89,7 @@ class RegisteredUserController extends Controller
             ]);
             //画像を保存
             
-            $request->file('image_file_name')->storeAs($image_path);
+            $request->file('image_file_name')->storeAs('public',$image_path);
 
             // トランザクションをコミット
             DB::commit();

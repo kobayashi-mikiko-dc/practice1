@@ -1,10 +1,22 @@
 <x-guest-layout>
+    <div class ="text-right">
+        <a href="{{ route('show') }}">
+            <x-primary-button>
+                一覧へ戻る
+            </x-primary-button>
+            </a>
+    </div>
+
     <form method="POST" action="{{ route('profile.update', $user) }}" enctype="multipart/form-data">
         @csrf
         @method('patch')
-        <?php
-        //dd($user->id);
-        ?>
+
+        @if(session('message'))
+        <div class="alert alert-danger red-text">
+            {{ session('message') }}
+        </div>
+        @endif
+
         <!-- Name -->
         <div>
             <x-input-label for="surname" :value="__('姓')" />
@@ -15,6 +27,7 @@
             <x-text-input id="given_name" class="block mt-1 w-full" type="text" name="given_name" :value="old('given_name', $user->given_name)" required autofocus autocomplete="given_name" />
             <x-input-error :messages="$errors->get('given_name')" class="mt-2" />
         </div>
+
         <div class="mt-4">
             <img src="{{ asset('storage/img/' .  $user->image_file_name) }}">
             <input type="file" name="image_file_name">
@@ -29,38 +42,33 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <?php 
-        $strDate = explode("-",$user->birth_day);
-        $date = array_map('intval', $strDate);
-        $userYear = $date[0];
-        $userMonth = $date[1];
-        $userDay = $date[2];
-      
+        <?php
+        //controllerで処理して渡した方がいい
+
+        
         ?>
         <!-- birth day -->
         <div class="mt-4">      
             <select id="year" name="year" class="form-select">
-                <option value="">{{$userYear}}</option>
                 @foreach(MyFunction::yearSelect() as $year)
-                    <option value="{{ $year }}">{{ old('year', $userYear) == $year ? 'selected' : '' }}{{ $year }}</option>
+                    <option value="{{ $year }}" {{ $year == $date['userYear'] ? 'selected' : '' }}>{{ $year }}</option>
+                    <!--$yearが$userYear(もともと設定していた年)と同じならプルダウンでその年をselected,そうでない（変更した）なら-->
                 @endforeach
                 
             </select>
             <label for="year">年</label>
 
             <select id="month" name="month" class="form-select">
-                <option value="">{{$userMonth}}</option>
                 @foreach(MyFunction::monthSelect() as $month)
-                    <option value="{{ $month }}">{{ old('month', $userMonth) == $month ? 'selected' : '' }}{{ $month }}</option>
+                    <option value="{{ $month }}" {{ $month == $date['userMonth'] ? 'selected' : '' }}>{{ $month }}</option>
                 @endforeach
                 
             </select>
             <label for="month">月</label>
 
             <select id="day" name="day" class="form-select">
-                <option value="">{{$userDay}}</option>
                 @foreach(MyFunction::daySelect() as $day)
-                    <option value="{{ $day }}">{{ old('day', $userDay) == $day ? 'selected' : '' }}{{ $day }}</option>
+                    <option value="{{ $day }}" {{ $day == $date['userDay'] ? 'selected' : '' }}>{{ $day }}</option>
                 @endforeach
                 
             </select>
