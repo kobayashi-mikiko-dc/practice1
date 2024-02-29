@@ -12,6 +12,10 @@ use Illuminate\View\View;
 use App\Models\User;
 use App\Lib\MyFunction;
 use Illuminate\Validation\Rule;
+use App\Listeners\ChangeLogListener;
+use App\Events\AccountUpdated;
+use Illuminate\Support\Facades\Log;
+//use はクラス名まで書く
 
 class ProfileController extends Controller
 {
@@ -39,6 +43,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $loginUser=auth()->user();
         $user = User::find($request->id);
         $rules = [
             'surname' => ['required', 'string', 'max:255'],
@@ -47,23 +52,26 @@ class ProfileController extends Controller
             'phone' => ['required', 'string', 'max:30', Rule::unique('users')->ignore($user->id)],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],                       
         ];
-        
-    
-        
+
         $validated = $request->validate($rules);
         
 
         $rules['birth_day'] = ['required', 'date', 'date_format:Y-m-d', 'before:today'];
         $validated['birth_day'] = date('Y-m-d', strtotime("{$request->year}-{$request->month}-{$request->day}"));        
-        //dd($validated);
+        
+
         try{
+
             DB::beginTransaction(); 
             //transaction処理
+
+            $oldData = $user->toArray();
+
             $user->update($validated);
             //DB::commit();
             
             if ($request->hasFile('image_file_name')){
-                dd('yes');
+                //dd('yes');
                 $format = $request->file('image_file_name')->getClientOriginalExtension();
                 $file_name = "{$request->id}_{$request->surname}_{$request->given_name}.{$format}";
                 $request->file('image_file_name')->storeAs('public/img', $file_name);
@@ -71,6 +79,11 @@ class ProfileController extends Controller
                     'image_file_name' => $file_name,
                 ]); 
             }
+
+            $newData = $user->makeHidden(['password']);
+            $newData = $user->toArray();
+            
+            event(new AccountUpdated($oldData, $newData));        
             DB::commit();
             
         }catch(Exception $e){
@@ -79,7 +92,7 @@ class ProfileController extends Controller
             Log::error('エラーが発生しました：' . $e->getMessage());
             throw $e; //親クラスに例外の処理を依頼する（親が勝手にやってくれる）
         }
-        
+
         $request->session()->flash('message', '更新しました');
         return back();
         
@@ -88,10 +101,21 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request, User $user)
+    public function destroy(Request $request, User $user, accountDeleted $event)
     {
         //$user = User::findOrFail($id);
         $user->delete();
+        
+        //-----履歴更新-----
+        /*
+        DB::transaction(function () use ($user, $params, $loginUser) {
+                
+            activity('user')
+                ->causedBy($loginUser)->log("{$loginUser->name}さんが{$user->name}さんのユーザ詳細情報を削除");
+        });
+        */
+        $event(new AccountDeleted($user));
+
         $request->session()->flash('message', '削除しました');
         return redirect('show');
     }

@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Lib\MyFunction;
-
+use App\Listeners\ChangeLogListener\handleAccountCreated;
+use App\Providers\EventServiceProvider;
 //viewで登録ボタン押す→controller->(モデル経由、登録)->viewに戻る
 
 class RegisteredUserController extends Controller
@@ -69,6 +70,18 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
+
+            /*
+            $params = $request->validated();
+            //-----履歴更新-----
+            DB::transaction(function () use ($user, $params, $loginUser) {
+                    
+                activity('user')
+                    ->log("{$user->name}さんがユーザ情報を新規作成");
+                    $this->updateUserProfile($user, $params);
+            });
+            */
+
             DB::commit();
             
             //TODO；dirをjpg/png対応できるようにしておく。imagefilenameからぬきとる
@@ -90,7 +103,8 @@ class RegisteredUserController extends Controller
             //画像を保存
             
             $request->file('image_file_name')->storeAs('public',$image_path);
-
+            
+            
             // トランザクションをコミット
             DB::commit();
 
@@ -100,7 +114,7 @@ class RegisteredUserController extends Controller
             throw $e; //親クラスに例外の処理を依頼する（親が勝手にやってくれる）
         }
 
-        event(new Registered($user));
+        event(new handleAccountCreated($user));
 
         Auth::login($user);
         return redirect(RouteServiceProvider::HOME);

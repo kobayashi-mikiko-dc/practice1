@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 //「きてほしい側」がuseかく
 class User extends Authenticatable
 {
+    //use LogsActivity;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -50,4 +51,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /*
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+            'surname',
+            'given_name',
+            'image_path',
+            'image_file_name',
+            'birth_day',
+            'phone',
+            'email',
+            'password',
+        ]);
+    }
+    */
 }
