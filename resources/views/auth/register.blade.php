@@ -31,7 +31,7 @@
             <select id="year" name="year" class="form-select">
                 <option value="">-</option>
                 @foreach(MyFunction::yearSelect() as $year)
-                    <option value="{{ $year }}">{{ old('year') == $year ? 'selected' : '' }}{{ $year }}</option>
+                    <option value="{{ $year }}" {{ old('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
                 @endforeach
                 <x-input-error :messages="$errors->get('year')" class="mt-2" />
             </select>
@@ -40,7 +40,7 @@
             <select id="month" name="month" class="form-select">
                 <option value="">-</option>
                 @foreach(MyFunction::monthSelect() as $month)
-                    <option value="{{ $month }}">{{ old('month') == $month ? 'selected' : '' }}{{ $month }}</option>
+                    <option value="{{ $month }}" {{ old('month') == $month ? 'selected' : '' }}>{{ $month }}</option>
                 @endforeach
                 <x-input-error :messages="$errors->get('month')" class="mt-2" />
             </select>
@@ -49,7 +49,7 @@
             <select id="day" name="day" class="form-select">
                 <option value="">-</option>
                 @foreach(MyFunction::daySelect() as $day)
-                    <option value="{{ $day }}">{{ old('day') == $day ? 'selected' : '' }}{{ $day }}</option>
+                    <option value="{{ $day }}" {{ old('day') == $day ? 'selected' : '' }}>{{ $day }}</option>
                 @endforeach
                 <x-input-error :messages="$errors->get('day')" class="mt-2" />
             </select>

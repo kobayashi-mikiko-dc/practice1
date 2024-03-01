@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\RegisterdController;
 use Illuminate\Support\Facades\Route;
 use App\Lib\MyFunction;
 
@@ -14,6 +15,9 @@ use App\Lib\MyFunction;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/logout', [Controller::class, 'logout'])->name('logout.info');
+Route::post('/logout', [Controller::class, 'logout'])->name('logout.info');
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,5 +46,5 @@ Route::get('/register', function () {
     return view('register', [MyFunction::class, 'daySelect'])->name('register.daySelect');
 });
 
-Route::resource('URI', ProfileController::class);
+//Route::resource('profile', ProfileController::class);
 require __DIR__.'/auth.php';

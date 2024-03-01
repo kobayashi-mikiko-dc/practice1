@@ -35,17 +35,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-
+        
+        
         $request->validate([
             'surname' => ['required', 'string', 'max:255'],
             'given_name' => ['required', 'string', 'max:255'],
-            'image_file_name'=>['required', 'file', 'mimes:jpeg,png', 'max:1000'], //kb
-            'birth_day'=>['required', 'date', 'before:today'],
+            //'image_file_name'=>['required', 'file', 'mimes:jpeg,png', 'max:1000'], //kb
+            //'birth_day'=>['required', 'date', 'before:today'],
             'phone' => ['required', 'string', 'max:30'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
- 
+        dd($request);
         //現時点ではidが確定しておらずfilenameを作れないためいったんnullに設定
         $file_name = null;
         
@@ -59,7 +60,7 @@ class RegisteredUserController extends Controller
             //user情報つくったら↓のuserに勝手にID情報もいれてくれる
             $file_name = null;
             $birth_day = date('Y-m-d', strtotime("{$request->year}-{$request->month}-{$request->day}"));
-
+            dd('hi');
             $user = User::create([
                 'surname' => $request->surname,
                 'given_name' => $request->given_name,
@@ -70,17 +71,10 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-
-            /*
-            $params = $request->validated();
-            //-----履歴更新-----
-            DB::transaction(function () use ($user, $params, $loginUser) {
-                    
-                activity('user')
-                    ->log("{$user->name}さんがユーザ情報を新規作成");
-                    $this->updateUserProfile($user, $params);
-            });
-            */
+            $oldData=null;
+            $newData = $user->makeHidden(['password']);
+            $newData = $user->toArray();
+            event(new AccountDeleted($oldData, $newData));  
 
             DB::commit();
             

@@ -30,7 +30,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\AccountUpdated' => [
             'App\Listeners\ChangeLogListener',
         ],
-        'App\Events\AccountDeleted' => [
+        'App\Events\ccountDeleted' => [
             'App\Listeners\ChangeLogListener',
         ],
     ];

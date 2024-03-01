@@ -103,18 +103,12 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request, User $user, accountDeleted $event)
     {
-        //$user = User::findOrFail($id);
+        $oldData = $user->toArray();
         $user->delete();
-        
-        //-----履歴更新-----
-        /*
-        DB::transaction(function () use ($user, $params, $loginUser) {
-                
-            activity('user')
-                ->causedBy($loginUser)->log("{$loginUser->name}さんが{$user->name}さんのユーザ詳細情報を削除");
-        });
-        */
-        $event(new AccountDeleted($user));
+ 
+        $newData = $user->makeHidden(['password']);
+        $newData = $user->toArray();       
+        event(new AccountDeleted($oldData, $newData));  
 
         $request->session()->flash('message', '削除しました');
         return redirect('show');

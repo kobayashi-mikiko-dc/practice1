@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\User;
 
 class AccountCreated
 {
@@ -17,9 +18,11 @@ class AccountCreated
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public $user;
+    public function __construct($old_data, $new_data)
     {
-        //
+        $this->old_data = $old_data;
+        $this->new_data = $new_data;
     }
 
     /**

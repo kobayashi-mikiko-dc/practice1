@@ -18,11 +18,12 @@ class AccountDeleted
     /**
      * Create a new event instance.
      */
-    public $event;
+    public $user;
 
-    public function __construct($event)
+    public function __construct($old_data, $new_data)
     {
-        $this->event = $event;
+        $this->old_data = $old_data;
+        $this->new_data = $new_data;
     }
 
 

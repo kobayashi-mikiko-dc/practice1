@@ -52,20 +52,5 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    /*
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly([
-            'surname',
-            'given_name',
-            'image_path',
-            'image_file_name',
-            'birth_day',
-            'phone',
-            'email',
-            'password',
-        ]);
-    }
-    */
+
 }
